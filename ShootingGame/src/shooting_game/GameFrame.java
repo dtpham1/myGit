@@ -29,6 +29,8 @@ public class GameFrame extends JFrame implements KeyListener, Runnable{
     boolean KeyRight = false;
     boolean KeySpace = false;
     
+    private boolean paused;
+    
     int cnt;
     
     Thread th;
@@ -36,8 +38,8 @@ public class GameFrame extends JFrame implements KeyListener, Runnable{
     Image craft_img = tk.getImage("craft.png");
     Image missile_img = tk.getImage("missile.png");
     Image enemy_img = tk.createImage("enemy.png");
-    ArrayList Missile_List = new ArrayList();
-    ArrayList Enemy_List = new ArrayList();
+    ArrayList<Missile> Missile_List = new ArrayList<Missile>();
+    ArrayList<Enemy> Enemy_List = new ArrayList<Enemy>();
     
     Image buffImage;
     Graphics buffg;
@@ -55,6 +57,8 @@ public class GameFrame extends JFrame implements KeyListener, Runnable{
         
         setTitle("shooting game");
         setSize(frame_wid, frame_hgt);
+        
+        paused = false;
         
         Dimension screen = tk.getScreenSize();
         
@@ -84,17 +88,36 @@ public class GameFrame extends JFrame implements KeyListener, Runnable{
         th.start();
     }//start
     
+    public void pause() {
+    	paused = !paused;
+    	if (!paused) {
+    		synchronized(th) {
+    			th.notify();
+    		}
+    	}
+    }
+    
     public void run(){
         try{
            while(true){
+        	   if (paused) {
+        		   synchronized(th) {
+        			   while (paused) {
+        				   th.wait();
+        			   }
+        		   }
+        	   }
                keyProcess();
                enemyProcess();
                missileProcess();
                repaint();
                Thread.sleep(20);
                cnt++;
-           }//while 
-        }catch(Exception e){}
+           }//while
+           
+        }catch(InterruptedException ie) {
+        	
+        }
     }//run
     
     public void missileProcess(){
@@ -162,11 +185,24 @@ public class GameFrame extends JFrame implements KeyListener, Runnable{
     
     public void keyPressed(KeyEvent e){
         switch(e.getKeyCode()){
-            case KeyEvent.VK_UP: KeyUp = true; break;
-            case KeyEvent.VK_DOWN: KeyDown = true; break;
-            case KeyEvent.VK_LEFT: KeyLeft = true; break;
-            case KeyEvent.VK_RIGHT: KeyRight = true; break;
-            case KeyEvent.VK_SPACE: KeySpace = true; break;    
+            case KeyEvent.VK_UP:
+            	KeyUp = true;
+            	break;
+            case KeyEvent.VK_DOWN:
+            	KeyDown = true;
+            	break;
+            case KeyEvent.VK_LEFT:
+            	KeyLeft = true;
+            	break;
+            case KeyEvent.VK_RIGHT:
+            	KeyRight = true;
+            	break;
+            case KeyEvent.VK_SPACE:
+            	KeySpace = true;
+            	break;
+            case KeyEvent.VK_ESCAPE:
+            	pause();
+            	break;
         }
     }//pressed
     

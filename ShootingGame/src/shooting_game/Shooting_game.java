@@ -12,14 +12,14 @@ package shooting_game;
  */
 public class Shooting_game {
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        // TODO code application logic here
-        
-        GameFrame gf = new GameFrame();
-        
-    }//main
-    
+	/**
+	 * @param args the command line arguments
+	 */
+	public static void main(String[] args) {
+		// TODO code application logic here
+
+		GameFrame gf = new GameFrame();
+
+	}//main
+
 }//shooting_game

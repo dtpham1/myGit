@@ -11,30 +11,26 @@ package shooting_game;
  * @author forainy
  */
 public class Enemy {
+	
+	//field
+	int x;
+	int y;
 
-    /**
-     * @param args the command line arguments
-     */
- 
-       //field
-        int x;
-        int y;
-        
-        
-        //method
-        
-        public void move (){
-            x = x-3;
-        }//move
-        
-        
-        //constructor
-        Enemy(int x, int y){
-        
-        this.x = this.x+x;
-        this.y = this.y+y;
-    }//Enemy con
-        
-    }
-    
+
+	//method
+
+	public void move (){
+		x = x-3;
+	}//move
+
+
+	//constructor
+	Enemy(int x, int y){
+
+		this.x = this.x+x;
+		this.y = this.y+y;
+	}//Enemy con
+
+}
+
 
