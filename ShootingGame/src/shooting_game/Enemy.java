@@ -1,36 +1,18 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-package shooting_game;
+package e_shooting_game;
 
 /**
+ * @author Erick Ayers
  *
- * @author forainy
  */
 public class Enemy {
+	int x, y;
 	
-	//field
-	int x;
-	int y;
-
-
-	//method
-
-	public void move (){
-		x = x-3;
-	}//move
-
-
-	//constructor
-	Enemy(int x, int y){
-
-		this.x = this.x+x;
-		this.y = this.y+y;
-	}//Enemy con
-
+	public Enemy(int x, int y) {
+		this.x = x;
+		this.y = y;
+	}
+	
+	public void move() {
+		x -= 2;
+	}
 }
-
-
