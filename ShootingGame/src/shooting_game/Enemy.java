@@ -4,33 +4,41 @@
  * and open the template in the editor.
  */
 
-package shooting_game;
+package gpa;
 
 /**
  *
  * @author forainy
  */
 public class Enemy {
-	
-	//field
-	int x;
-	int y;
 
-
-	//method
-
-	public void move (){
-		x = x-3;
-	}//move
-
-
-	//constructor
-	Enemy(int x, int y){
-
-		this.x = this.x+x;
-		this.y = this.y+y;
-	}//Enemy con
-
-}
-
+    /**
+     * @param args the command line arguments
+     */
+ 
+       //field
+        int x;
+        int y;
+        
+        
+        //method
+        
+        public void move (){
+            x = x-3;
+        }//move
+        
+        public void move (int speed){
+        	x = x-speed;
+        }
+        
+        
+        //constructor
+        Enemy(int x, int y){
+        
+        this.x = this.x+x;
+        this.y = this.y+y;
+    }//Enemy con
+        
+    }
+    
 

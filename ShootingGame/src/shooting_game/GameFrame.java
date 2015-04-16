@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package shooting_game;
+package gpa;
 
 import java.awt.*;
 import javax.swing.*;
@@ -35,11 +35,14 @@ public class GameFrame extends JFrame implements KeyListener, Runnable{
     
     Thread th;
     Toolkit tk = Toolkit.getDefaultToolkit();
-    Image craft_img = tk.getImage("craft.png");
-    Image missile_img = tk.getImage("missile.png");
-    Image enemy_img = tk.createImage("enemy.png");
+    Image craft_img = tk.getImage("hero.gif");
+    Image missile_img = tk.getImage("missile.gif");
+    Image enemy1_img = tk.createImage("fb-mon.gif");
+    Image enemy2_img = tk.createImage("netflix-mon.gif");
     ArrayList<Missile> Missile_List = new ArrayList<Missile>();
     ArrayList<Enemy> Enemy_List = new ArrayList<Enemy>();
+	ArrayList<Image> Enemy_ImageList = new ArrayList();
+    int [] Enemy_SpeedList;
     
     Image buffImage;
     Graphics buffg;
@@ -55,7 +58,7 @@ public class GameFrame extends JFrame implements KeyListener, Runnable{
         init();
         start();
         
-        setTitle("shooting game");
+        setTitle("GPA: Grade Point Avenger");
         setSize(frame_wid, frame_hgt);
         
         paused = false;
@@ -108,7 +111,7 @@ public class GameFrame extends JFrame implements KeyListener, Runnable{
         		   }
         	   }
                keyProcess();
-               enemyProcess();
+               randomEnemyProcess();
                missileProcess();
                repaint();
                Thread.sleep(20);
@@ -145,6 +148,45 @@ public class GameFrame extends JFrame implements KeyListener, Runnable{
             Enemy_List.add(en);
         }//if
     }//enemyProcess
+	
+	public void randomEnemyProcess(){
+    	for(int i=0; i<Enemy_List.size();i++){
+            en =(Enemy)Enemy_List.get(i);
+            en.move((int)Enemy_SpeedList[i]);
+        }//fori
+    
+        if(cnt% 300 == 0){        	
+        	int numberOfEnemies = 7;
+        	
+        	for(int i=0; i<numberOfEnemies; i++){
+        		en = new Enemy(frame_wid, getRandom(550));
+                Enemy_List.add(en);
+                Enemy_ImageList.add(getRandImage());
+                
+        	}
+        	Enemy_SpeedList = new int [Enemy_List.size()];
+        	for(int i=0; i<Enemy_SpeedList.length;i++){
+        		int speed = getRandom(10);
+        		System.out.println(speed);
+        		Enemy_SpeedList[i]=speed;
+        		
+        	}//fori stores random speed for each monster
+        }//if
+    }//random enemy process
+    
+    public Image getRandImage(){
+    	Image randImage;
+    	if(getRandom(10) > 5){
+    		randImage = enemy1_img;
+    	}
+    	else{
+    		randImage = enemy2_img;
+    	}
+    	
+    	return randImage;
+    }//choose random enemy
+	
+	
     
     public void paint(Graphics g){
         buffImage = createImage(frame_wid, frame_hgt);
@@ -171,15 +213,15 @@ public class GameFrame extends JFrame implements KeyListener, Runnable{
     public void drawMissile(){
         for(int i=0; i<Missile_List.size(); ++i){
             ms = (Missile)Missile_List.get(i);
-            buffg.drawImage(missile_img, ms.pos.x+50, ms.pos.y+15, this);
+            buffg.drawImage(missile_img, ms.pos.x+125, ms.pos.y+25, this);
             ms.move();
         }//fori
     }//drawMissile
     
-    public void drawEnemy(){
+     public void drawEnemy(){
         for(int i=0; i<Enemy_List.size();i++){
             en =(Enemy)(Enemy_List.get(i));
-            buffg.drawImage(enemy_img, en.x, en.y, this);
+            buffg.drawImage((Image) Enemy_ImageList.get(i), en.x, en.y, this);
         }//fori
     }//drawEnemy
     
@@ -228,6 +270,10 @@ public class GameFrame extends JFrame implements KeyListener, Runnable{
         
     }//proc
     
-    
+     public static int getRandom(int max){
+    	Random rand = new Random();
+    	int num = rand.nextInt(max);
+    	return num;
+    }//random number generator
     
 }//gameFrame
