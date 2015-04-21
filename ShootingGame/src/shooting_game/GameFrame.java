@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package gpa;
 
 import java.awt.*;
@@ -154,6 +148,7 @@ public class GameFrame extends JFrame implements KeyListener, Runnable{
 				randomEnemyProcess();
 				missileProcess();
 				repaint();
+				collisionProcess();
 				Thread.sleep(20);
 				cnt++;
 			}//while
@@ -219,6 +214,37 @@ public class GameFrame extends JFrame implements KeyListener, Runnable{
 		}//if
 	}//random enemy process
 	
+	public void collisionProcess() {
+		heroRect.setLocation(x, y);
+		
+		//Run through the missile list once, as it is likely longer than the enemy list.
+		for (int i = 0; i < Missile_List.size(); ++i) {
+			ms = Missile_List.get(i);
+			missileRect.setRect(ms.pos.x, ms.pos.y, mw, mh);
+			for (int j = 0; j < Enemy_List.size(); ++j) {
+				en = Enemy_List.get(j);
+				enemyRect.setRect(en.x, en.y, ew[en.enemyType], eh[en.enemyType]);
+				if(missileRect.intersects(enemyRect)) {
+					dealDamage(j);
+					break;
+				}
+			}
+		}
+		
+		/* Run through the Enemy List one extra time to check collisions
+		 * with the player, rather than running this check every time
+		 * the list is run through with missiles. 
+		 */
+		for(int i=0; i<Enemy_List.size();i++){
+			en = Enemy_List.get(i);
+			enemyRect.setRect(en.x, en.y, ew[en.enemyType], eh[en.enemyType]);
+			if (heroRect.intersects(enemyRect)) {
+				takeDamage();
+				dealDamage(i);
+			}
+		}
+	}
+	
 	public void takeDamage() {
 		health -= 5;
 		if (health <= 0) {
@@ -231,7 +257,6 @@ public class GameFrame extends JFrame implements KeyListener, Runnable{
 		Enemy_SpeedList.remove(i);
 		Enemy_ImageList.remove(i);
 	}
-
 
 /*	public Image getRandImage(){
 		Image randImage;
@@ -268,7 +293,6 @@ public class GameFrame extends JFrame implements KeyListener, Runnable{
 
 	public void drawChar(){
 		buffg.drawImage(craft_img, x, y, this);
-		heroRect.setLocation(x, y);
 	}//drawChar
 
 	public void drawMissile(){
@@ -283,20 +307,6 @@ public class GameFrame extends JFrame implements KeyListener, Runnable{
 		for(int i=0; i<Enemy_List.size();i++){
 			en = Enemy_List.get(i);
 			buffg.drawImage(Enemy_ImageList.get(i), en.x, en.y, this);
-
-			enemyRect.setRect(en.x, en.y, ew[en.enemyType], eh[en.enemyType]);
-			if (heroRect.intersects(enemyRect)) {
-				takeDamage();
-				dealDamage(i);
-			}
-			for (int j = 0; j < Missile_List.size(); ++j) {
-				ms = Missile_List.get(j);
-				missileRect.setRect(ms.pos.x, ms.pos.y, mw, mh);
-				if(missileRect.intersects(enemyRect)) {
-					dealDamage(i);
-					break;
-				}
-			}
 		}//fori
 	}//drawEnemy
 
