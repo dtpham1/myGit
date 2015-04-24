@@ -70,7 +70,6 @@ public class GameFrame extends JFrame implements KeyListener, Runnable{
 	GameFrame(){
 
 		init();
-		start();
 
 		setTitle("GPA: Grade Point Avenger");
 		setSize(frame_wid, frame_hgt);
@@ -87,9 +86,7 @@ public class GameFrame extends JFrame implements KeyListener, Runnable{
 		setResizable(false);
 		setVisible(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-
-
+		addKeyListener(this);
 	}//constructor
 
 	public void init(){
@@ -123,7 +120,6 @@ public class GameFrame extends JFrame implements KeyListener, Runnable{
 	}//init
 
 	public void start(){
-		addKeyListener(this);
 		th = new Thread(this);
 		th.start();
 	}//start
@@ -175,7 +171,6 @@ public class GameFrame extends JFrame implements KeyListener, Runnable{
 			Missile_List.add(ms);
 		}//if          
 	}//missileProcess
-
 
 	public void randomEnemyProcess(double spawnRate){
 		for(int i=0; i<Enemy_List.size();i++){
@@ -315,6 +310,11 @@ public class GameFrame extends JFrame implements KeyListener, Runnable{
 		case KeyEvent.VK_ESCAPE:
 			pause();
 			break;
+		case KeyEvent.VK_ENTER:
+			if (th == null) {
+				start();
+			}
+			break;
 		}
 	}//pressed
 
@@ -344,28 +344,29 @@ public class GameFrame extends JFrame implements KeyListener, Runnable{
 
 	public void keyProcess() {
 		if (keyUp) {
-			if (y - 5 >= 0) {
+			if (y > 0) {
 				y -= 5;
 			} else {
 				y = 0;
 			}
 		}
 		if (keyDown) {
-			if (y + craft_img.getHeight(this) + 5 <= this.frame_hgt) {
+			if (y + craft_img.getHeight(this) < this.frame_hgt) {
 				y += 5;
 			} else {
 				y = this.frame_hgt - craft_img.getHeight(this);
 			}
+		
 		}
 		if (keyLeft) {
-			if (x - 5 >= 0) {
+			if (x > 0) {
 				x -= 5;
 			} else {
 				x = 0;
 			}
 		}
 		if (keyRight) {
-			if (x + craft_img.getWidth(this) + 5 <= this.frame_wid) {
+			if (x + craft_img.getWidth(this) < this.frame_wid) {
 				x += 5;
 			} else {
 				x = this.frame_wid - craft_img.getWidth(this);
