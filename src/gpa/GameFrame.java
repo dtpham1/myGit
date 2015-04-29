@@ -135,7 +135,7 @@ public class GameFrame extends JFrame implements KeyListener, Runnable{
 			}
 		}
 	}
-
+//
 	public void run(){
 		try{
 			while(true){
