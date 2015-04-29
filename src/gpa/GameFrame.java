@@ -8,6 +8,7 @@ import javax.swing.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.text.DecimalFormat;
 import java.util.*;
 
 /**
@@ -22,6 +23,8 @@ public class GameFrame extends JFrame implements KeyListener, Runnable{
 	int frame_hgt = 600;
 
 	int x, y;
+	
+	double spawnRate;
 
 	boolean keyUp = false;
 	boolean keyDown = false;
@@ -34,16 +37,18 @@ public class GameFrame extends JFrame implements KeyListener, Runnable{
 	int cnt;
 	
 	long gameScore = 0L;
-	int health;
+	double gpa_double;
+	String gpa_String;
 	
 
 	Thread th;
 	Toolkit tk = Toolkit.getDefaultToolkit();
 	
-	String craftPath = "hero.gif", missilePath = "missile.gif";
+	String craftPath = "img/hero.gif", missilePath = "img/missile.gif", boomPath = "img/boom.gif";
 	
 	Image craft_img = tk.getImage(craftPath);
 	Image missile_img = tk.getImage(missilePath);
+	Image boom_img = tk.getImage(boomPath);
 	Image[] enemies;
 	int totalEnemyTypes;
 	
@@ -94,7 +99,8 @@ public class GameFrame extends JFrame implements KeyListener, Runnable{
 
 		x = 100;
 		y = 100;
-		health = 100;
+		gpa_double = 4.0;
+		spawnRate=100;
 		
 		totalEnemyTypes = Enemy.ENEMY_TYPES.length;
 
@@ -144,8 +150,16 @@ public class GameFrame extends JFrame implements KeyListener, Runnable{
 						}
 					}
 				}
+				
+				//increase spawn rate after every wave (smaller the faster! Can't be equal to or lower than 0!
+				if(spawnRate>1){
+					spawnRate = spawnRate-0.01;
+					System.out.println("Current spawn rate: " + spawnRate + " (the lower the faster!)");
+				}
+			
+				
 				keyProcess();
-				randomEnemyProcess();
+				randomEnemyProcess(spawnRate);
 				missileProcess();
 				repaint();
 				collisionProcess();
@@ -165,53 +179,39 @@ public class GameFrame extends JFrame implements KeyListener, Runnable{
 		}//if          
 	}//missileProcess
 
-/*	public void enemyProcess(){
-		for(int i=0; i<Enemy_List.size();i++){
-			en =(Enemy)Enemy_List.get(i);
-			en.move();
-		}//fori
-		if(cnt% 300 == 0){
-			en = new Enemy(frame_wid, 100);
-			Enemy_List.add(en);
-			en = new Enemy(frame_wid, 200);
-			Enemy_List.add(en);
-			en = new Enemy(frame_wid, 300);
-			Enemy_List.add(en);
-			en = new Enemy(frame_wid, 400);
-			Enemy_List.add(en);
-			en = new Enemy(frame_wid, 500);
-			Enemy_List.add(en);
-		}//if
-	}//enemyProcess
-*/
-	
-	public void randomEnemyProcess(){
+
+	public void randomEnemyProcess(double spawnRate){
 		for(int i=0; i<Enemy_List.size();i++){
 			en = Enemy_List.get(i);
 			en.move(Enemy_SpeedList.get(i));
+			if (en.x + ew[en.enemyType] < 0) {
+				Enemy_List.remove(i);
+				Enemy_SpeedList.remove(i);
+				Enemy_ImageList.remove(i);
+				--i;
+			}
 		}//fori
-
-		if(cnt% 200 == 0){        	
+		
+	
+		
+		if(cnt % 10 == 0){        	
 			int numberOfEnemies = 7;
-
+			
+			
 			for(int i=0; i<numberOfEnemies; i++){
-				en = new Enemy(frame_wid, (int) (Math.random() * frame_hgt), (int) (Math.random() * totalEnemyTypes));
+				int type = (int) (Math.random() * totalEnemyTypes);
+				en = new Enemy(frame_wid, (int) (Math.random() * (frame_hgt - eh[type])), type);
 				Enemy_List.add(en);
 				Enemy_ImageList.add(enemies[en.enemyType]);
 				int speed = getRandom(10);
-				System.out.println(speed);
 				Enemy_SpeedList.add(speed);
+				
+				
 			}
 			
-			/*Enemy_SpeedList = new ArrayList<Integer>(Enemy_List.size());
-			for(int i=0; i<Enemy_SpeedList.size();i++){
-				int speed = getRandom(10);
-				System.out.println(speed);
-				Enemy_SpeedList.set(i, speed);
-
-			}//fori stores random speed for each monster
-			*/
 		}//if
+		
+	
 	}//random enemy process
 	
 	public void collisionProcess() {
@@ -239,37 +239,48 @@ public class GameFrame extends JFrame implements KeyListener, Runnable{
 			en = Enemy_List.get(i);
 			enemyRect.setRect(en.x, en.y, ew[en.enemyType], eh[en.enemyType]);
 			if (heroRect.intersects(enemyRect)) {
-				takeDamage();
-				dealDamage(i);
+				takeDamage(i);
 			}
 		}
 	}
 	
 	public void takeDamage() {
-		health -= 5;
-		if (health <= 0) {
+		
+		if (gpa_double == 0) {
 			
 		}
+		else
+		{
+			gpa_double -= 0.05;
+		}
+	}
+	
+	public void takeDamage(int i) {
+		
+		Enemy_List.remove(i);
+		Enemy_SpeedList.remove(i);
+		Enemy_ImageList.remove(i);
+		
+		//If statement ensures GPA does not go negative.
+		if (gpa_double <= 0) {
+			gpa_String = "FLUNKED!!!";
+			
+		}
+		else{
+			gpa_double -= 0.05;
+		}
+		
 	}
 	
 	public void dealDamage(int i) {
 		Enemy_List.remove(i);
 		Enemy_SpeedList.remove(i);
 		Enemy_ImageList.remove(i);
+		if (gpa_double + .05 <= 4) {
+			gpa_double += 0.05;
+		}
+		gameScore = gameScore+5;
 	}
-
-/*	public Image getRandImage(){
-		Image randImage;
-		if(getRandom(10) > 5){
-			randImage = enemy1_img;
-		}
-		else{
-			randImage = enemy2_img;
-		}
-
-		return randImage;
-	}//choose random enemy
-*/
 
 	public void paint(Graphics g){
 		buffImage = createImage(frame_wid, frame_hgt);
@@ -298,24 +309,42 @@ public class GameFrame extends JFrame implements KeyListener, Runnable{
 	public void drawMissile(){
 		for(int i=0; i<Missile_List.size(); ++i){
 			ms = Missile_List.get(i);
-			buffg.drawImage(missile_img, ms.pos.x+125, ms.pos.y+25, this);
-			ms.move();
+			
+			//if statement removes missile if it leaves the visible area
+			if(ms.pos.x > frame_wid){
+				Missile_List.remove(i);
+				break;
+			}
+			else{
+				buffg.drawImage(missile_img, ms.pos.x+125, ms.pos.y+25, this);
+				ms.move();
+			}
+			
 		}//fori
 	}//drawMissile
 
 	public void drawEnemy(){
 		for(int i=0; i<Enemy_List.size();i++){
 			en = Enemy_List.get(i);
-			buffg.drawImage(Enemy_ImageList.get(i), en.x, en.y, this);
+	
+				buffg.drawImage(Enemy_ImageList.get(i), en.x, en.y, this);
+			
 		}//fori
 	}//drawEnemy
 
+	public void drawBoom(int x, int y) {
+		buffg.drawImage(boom_img, x, y, this);
+	}
+	
 	public void drawScore() {
 		buffg.drawString("SCORE: " + gameScore, 10, frame_hgt - 15);
 	}
 
 	public void drawHealth() {
-		buffg.drawString("HEALTH: " + health, 10, 45);
+		String pattern = "###.###";
+		String gpa_String = Double.toString(gpa_double) + "0";
+		gpa_String = gpa_String.substring(0, 4);
+		buffg.drawString("GPA: " + gpa_String, 10, 45);
 	}
 
 	public void keyPressed(KeyEvent e){
